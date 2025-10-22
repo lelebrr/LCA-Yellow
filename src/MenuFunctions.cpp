@@ -106,7 +106,7 @@ MenuFunctions::MenuFunctions()
     lv_disp_flush_ready(disp);
   }
 
-  bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
+  void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
     extern Display display_obj;
     static bool was_pressed = false;
     bool touched = false;
@@ -145,7 +145,7 @@ MenuFunctions::MenuFunctions()
   // Handle touch state and coordinates
   if (!touched) {
       data->state = LV_INDEV_STATE_REL;
-      return false;
+      return;
   }
   if (touchX >= WIDTH_1 || touchY >= HEIGHT_1) {
       Serial.println("Touch outside expected parameters:");
@@ -154,13 +154,12 @@ MenuFunctions::MenuFunctions()
       Serial.print(" y: ");
       Serial.print(touchY);
       data->state = LV_INDEV_STATE_REL;
-      return false;
+      return;
   }
 
   data->state = LV_INDEV_STATE_PR;
   data->point.x = touchX;
   data->point.y = touchY;
-  return false;
 }
 
 
@@ -175,7 +174,7 @@ MenuFunctions::MenuFunctions()
     disp_drv.hor_res = WIDTH_1;
     disp_drv.ver_res = HEIGHT_1;
     disp_drv.flush_cb = my_disp_flush;
-    disp_drv.buffer = &disp_buf;
+    disp_drv.draw_buf = &disp_buf;
     lv_disp_drv_register(&disp_drv);
 
     lv_indev_drv_t indev_drv;
@@ -215,10 +214,10 @@ MenuFunctions::MenuFunctions()
     extern LinkedList<AccessPoint>* access_points;
     extern WiFiScan wifi_scan_obj;
 
-    lv_obj_t * list1 = lv_list_create(lv_scr_act(), NULL);
+    lv_obj_t * list1 = lv_list_create(lv_scr_act());
     lv_obj_set_size(list1, 320, 240);
     lv_obj_set_width(list1, LV_HOR_RES);
-    lv_obj_align(list1, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(list1, LV_ALIGN_CENTER, 0, 0);
 
     lv_obj_t * list_btn;
 
@@ -255,16 +254,21 @@ MenuFunctions::MenuFunctions()
   }
 
   // Function to work with list of Stations
-  void station_list_cb(lv_obj_t * btn, lv_event_t event) {
+  void station_list_cb(lv_event_t* e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t* btn = lv_event_get_target(e);
+    lv_obj_t* list = lv_obj_get_parent(btn);
+
+
     extern LinkedList<Station>* stations;
     extern MenuFunctions menu_function_obj;
     extern WiFiScan wifi_scan_obj;
 
-    String btn_text = lv_list_get_btn_text(btn);
+    String btn_text = lv_list_get_btn_text(list, btn);
     String display_string = "";
     char addr[] = "00:00:00:00:00:00";
 
-    if (lv_event_get_code(event) == LV_EVENT_CLICKED) {
+    if (code == LV_EVENT_CLICKED) {
       if (btn_text != text09) {
       }
       else {
@@ -286,7 +290,7 @@ MenuFunctions::MenuFunctions()
       }
     }
 
-    if (lv_event_get_code(event) == LV_EVENT_VALUE_CHANGED) {
+    if (code == LV_EVENT_VALUE_CHANGED) {
       if (lv_btn_get_state(btn) == LV_BTN_STATE_CHECKED_RELEASED) {
         for (int i = 0; i < stations->size(); i++) {
           wifi_scan_obj.getMAC(addr, stations->get(i).mac, 0);
@@ -318,10 +322,10 @@ MenuFunctions::MenuFunctions()
   void MenuFunctions::selectEPHTMLGFX() {
     extern EvilPortal evil_portal_obj;
 
-    lv_obj_t * list1 = lv_list_create(lv_scr_act(), NULL);
+    lv_obj_t * list1 = lv_list_create(lv_scr_act());
     lv_obj_set_size(list1, 160, 200);
     lv_obj_set_width(list1, LV_HOR_RES);
-    lv_obj_align(list1, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(list1, LV_ALIGN_CENTER, 0, 0);
 
     lv_obj_t * list_btn;
 
@@ -343,14 +347,18 @@ MenuFunctions::MenuFunctions()
     }
   }
 
-  void html_list_cb(lv_obj_t * btn, lv_event_t event) {
+  void html_list_cb(lv_event_t* e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t* btn = lv_event_get_target(e);
+    lv_obj_t* list = lv_obj_get_parent(btn);
+
     extern EvilPortal evil_portal_obj;
     extern MenuFunctions menu_function_obj;
 
-    String btn_text = lv_list_get_btn_text(btn);
+    String btn_text = lv_list_get_btn_text(list, btn);
     String display_string = "";
 
-    if (lv_event_get_code(event) == LV_EVENT_CLICKED) {
+    if (code == LV_EVENT_CLICKED) {
       if (btn_text != text09) {
       }
       else {
@@ -370,7 +378,7 @@ MenuFunctions::MenuFunctions()
       }
     }
 
-    if (lv_event_get_code(event) == LV_EVENT_VALUE_CHANGED) {
+    if (code == LV_EVENT_VALUE_CHANGED) {
       if (lv_btn_get_state(btn) == LV_BTN_STATE_CHECKED_RELEASED) {
         for (int i = 1; i < evil_portal_obj.html_files->size(); i++) {
           if (evil_portal_obj.html_files->get(i) == btn_text) {
@@ -400,10 +408,10 @@ MenuFunctions::MenuFunctions()
     extern LinkedList<AccessPoint>* access_points;
     extern LinkedList<AirTag>* airtags;
 
-    lv_obj_t * list1 = lv_list_create(lv_scr_act(), NULL);
+    lv_obj_t * list1 = lv_list_create(lv_scr_act());
     lv_obj_set_size(list1, 160, 200);
     lv_obj_set_width(list1, LV_HOR_RES);
-    lv_obj_align(list1, NULL, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_align(list1, LV_ALIGN_CENTER, 0, 0);
 
     lv_obj_t * list_btn;
 
@@ -443,17 +451,21 @@ MenuFunctions::MenuFunctions()
     }
   }
 
-  void at_list_cb(lv_obj_t * btn, lv_event_t event) {
+  void at_list_cb(lv_event_t* e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t* btn = lv_event_get_target(e);
+    lv_obj_t* list = lv_obj_get_parent(btn);
+
     extern MenuFunctions menu_function_obj;
     extern WiFiScan wifi_scan_obj;
     extern LinkedList<AirTag>* airtags;
     extern Display display_obj;
 
-    String btn_text = lv_list_get_btn_text(btn);
+    String btn_text = lv_list_get_btn_text(list, btn);
     String display_string = "";
 
     // Button is clicked
-    if (lv_event_get_code(event) == LV_EVENT_CLICKED) {
+    if (code == LV_EVENT_CLICKED) {
       if (btn_text != text09) {
       }
       // It's the back button
@@ -474,7 +486,7 @@ MenuFunctions::MenuFunctions()
       }
     }
 
-    if (lv_event_get_code(event) == LV_EVENT_VALUE_CHANGED) {
+    if (code == LV_EVENT_VALUE_CHANGED) {
       if (lv_btn_get_state(btn) == LV_BTN_STATE_CHECKED_RELEASED) {
         bool do_that_thang = false;
         for (int i = 0; i < airtags->size(); i++) {
@@ -516,15 +528,19 @@ MenuFunctions::MenuFunctions()
     }
   }
 
-  void ap_list_cb(lv_obj_t * btn, lv_event_t event) {
+  void ap_list_cb(lv_event_t* e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t* btn = lv_event_get_target(e);
+    lv_obj_t* list = lv_obj_get_parent(btn);
+
     extern LinkedList<AccessPoint>* access_points;
     extern MenuFunctions menu_function_obj;
     extern WiFiScan wifi_scan_obj;
 
-    String btn_text = lv_list_get_btn_text(btn);
+    String btn_text = lv_list_get_btn_text(list, btn);
     String display_string = "";
 
-    if (lv_event_get_code(event) == LV_EVENT_CLICKED) {
+    if (code == LV_EVENT_CLICKED) {
       if (btn_text != text09) {
       }
       else {
@@ -544,7 +560,7 @@ MenuFunctions::MenuFunctions()
       }
     }
 
-    if (lv_event_get_code(event) == LV_EVENT_VALUE_CHANGED) {
+    if (code == LV_EVENT_VALUE_CHANGED) {
       if (lv_btn_get_state(btn) == LV_BTN_STATE_CHECKED_RELEASED) {
         for (int i = 0; i < access_points->size(); i++) {
           if (access_points->get(i).essid == btn_text) {
@@ -568,16 +584,20 @@ MenuFunctions::MenuFunctions()
     }
   }
 
-  void ap_info_list_cb(lv_obj_t * btn, lv_event_t event) {
+  void ap_info_list_cb(lv_event_t* e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t* btn = lv_event_get_target(e);
+    lv_obj_t* list = lv_obj_get_parent(btn);
+
     extern LinkedList<AccessPoint>* access_points;
     extern MenuFunctions menu_function_obj;
     extern WiFiScan wifi_scan_obj;
 
-    String btn_text = lv_list_get_btn_text(btn);
+    String btn_text = lv_list_get_btn_text(list, btn);
     String display_string = "";
 
     // Exit function
-    if (lv_event_get_code(event) == LV_EVENT_CLICKED) {
+    if (code == LV_EVENT_CLICKED) {
       if (btn_text != text09) {
         for (int i = 0; i < access_points->size(); i++) {
           if (access_points->get(i).essid == btn_text) {
@@ -610,27 +630,27 @@ MenuFunctions::MenuFunctions()
 
     String display_string = "";
     // Create a keyboard and apply the styles
-    kb = lv_keyboard_create(lv_scr_act(), NULL);
+    kb = lv_keyboard_create(lv_scr_act());
     lv_obj_set_size(kb, LV_HOR_RES, LV_VER_RES / 2);
     lv_obj_set_event_cb(kb, add_ssid_keyboard_event_cb);
 
     // Create one text area
     // Store all SSIDs
-    ta1 = lv_textarea_create(lv_scr_act(), NULL);
+    ta1 = lv_textarea_create(lv_scr_act());
     lv_textarea_set_one_line(ta1, false);
     lv_obj_set_width(ta1, LV_HOR_RES);
     lv_obj_set_height(ta1, (LV_VER_RES / 2) - 35);
     lv_obj_set_pos(ta1, 5, 20);
     lv_textarea_set_cursor_hidden(ta1, true);
-    lv_obj_align(ta1, NULL, LV_ALIGN_IN_TOP_MID, NULL, NULL);
+    lv_obj_align(ta1, LV_ALIGN_TOP_MID, 0, 0);
     lv_textarea_set_placeholder_text(ta1, text_table1[0]);
 
     // Create second text area
     // Add SSIDs
-    ta2 = lv_textarea_create(lv_scr_act(), ta1);
+    ta2 = lv_textarea_create(lv_scr_act());
     lv_textarea_set_cursor_hidden(ta2, false);
     lv_textarea_set_one_line(ta2, true);
-    lv_obj_align(ta2, NULL, LV_ALIGN_IN_TOP_MID, NULL, (LV_VER_RES / 2) - 35);
+    lv_obj_align(ta2, LV_ALIGN_TOP_MID, 0, (LV_VER_RES / 2) - 35);
     lv_textarea_set_text(ta2, "");
     lv_textarea_set_placeholder_text(ta2, text_table1[1]);
 
@@ -648,16 +668,19 @@ MenuFunctions::MenuFunctions()
   }
 
   // Keyboard callback dedicated to joining wifi
-  void add_ssid_keyboard_event_cb(lv_obj_t * keyboard, lv_event_t event){
+  void add_ssid_keyboard_event_cb(lv_event_t* e){
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t* keyboard = lv_event_get_target(e);
+
     extern Display display_obj;
     extern MenuFunctions menu_function_obj;
     extern WiFiScan wifi_scan_obj;
     extern LinkedList<ssid>* ssids;
 
-    lv_keyboard_def_event_cb(kb, event);
+    lv_keyboard_def_event_cb(e);
 
     // User has applied text box
-    if(lv_event_get_code(event) == LV_EVENT_APPLY){
+    if(code == LV_EVENT_APPLY){
       String display_string = "";
       printf("LV_EVENT_APPLY\n");
 
@@ -674,7 +697,7 @@ MenuFunctions::MenuFunctions()
       lv_textarea_set_text(ta1, display_string.c_str());
 
       lv_textarea_set_text(ta2, "");
-    }else if(lv_event_get_code(event) == LV_EVENT_CANCEL){
+    }else if(code == LV_EVENT_CANCEL){
       printf("LV_EVENT_CANCEL\n");
       menu_function_obj.deinitLVGL();
       display_obj.exit_draw = true; // set everything back to normal
@@ -682,9 +705,11 @@ MenuFunctions::MenuFunctions()
   }
 
 
-  void ta_event_cb(lv_obj_t * ta, lv_event_t event)
+  void ta_event_cb(lv_event_t* e)
   {
-    if(lv_event_get_code(event) == LV_EVENT_CLICKED) {
+    lv_event_code_t code = lv_event_get_code(e);
+    lv_obj_t* ta = lv_event_get_target(e);
+    if(code == LV_EVENT_CLICKED) {
       if(kb != NULL)
         lv_keyboard_set_textarea(kb, ta);
     }
