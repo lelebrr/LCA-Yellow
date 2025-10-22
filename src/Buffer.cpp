@@ -1,4 +1,5 @@
 #include "Buffer.h"
+#include "configs.h"
 #include "lang_var.h"
 
 Buffer::Buffer(){

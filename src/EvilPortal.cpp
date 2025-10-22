@@ -45,7 +45,7 @@ void EvilPortal::setup() {
 #endif
 }
 
-bool EvilPortal::begin(const std::vector<WiFiScan::SSID>& ssids, const std::vector<WiFiScan::AccessPoint>& access_points) {
+bool EvilPortal::begin(const std::vector<SSID>& ssids, const std::vector<AccessPoint>& access_points) {
   if (!this->setAP(ssids, access_points)) {
     Serial.println("Falha ao configurar o AP");
     return false;
@@ -152,7 +152,7 @@ bool EvilPortal::setHtml() {
   return true;
 }
 
-bool EvilPortal::setAP(const std::vector<WiFiScan::SSID>& ssids, const std::vector<WiFiScan::AccessPoint>& access_points) {
+bool EvilPortal::setAP(const std::vector<SSID>& ssids, const std::vector<AccessPoint>& access_points) {
   String ap_config = "";
 
   // Prioridade 1: APs selecionados na GUI
