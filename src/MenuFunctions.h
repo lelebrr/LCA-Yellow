@@ -18,8 +18,7 @@ class WiFiScan;
 #ifdef HAS_SCREEN
   #define BATTERY_ANALOG_ON 0
 
-// #include "structs.h"
-// #include "structs.h"
+// #include "structs.h" // ✅ Comentado - structs já definidas em WiFiScan.h
   #include "WiFiScan.h"  // ✅ Incluir header primeiro
   #include "BatteryInterface.h"
   #include "SDInterface.h"
