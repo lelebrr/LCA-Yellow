@@ -1,7 +1,14 @@
 #include "CommandLine.h"
 #include <ESPAsyncWebServer.h>
 #include "WiFiScan.h"
+#include "EvilPortal.h"
+
+// DECLARAÇÕES EXTERNAS
 extern WiFiScan wifi_scan_obj;
+extern EvilPortal evil_portal_obj;
+extern std::vector<ssid>* ssids;
+extern std::vector<AccessPoint>* access_points;
+extern LinkedList<Station>* stations;
 
 void handleBTAttack(uint8_t attack_type, uint16_t color, String message) {
   #ifdef HAS_SCREEN
@@ -532,6 +539,7 @@ void CommandLine::runCommand(String input) {
         menu_function_obj.drawStatusBar();
       #endif
       wifi_scan_obj.StartScan(WIFI_SCAN_PACKET_RATE, TFT_ORANGE);
+      // wifi_scan_obj.renderPacketRate(); // Método não implementado, comentado
     }
     // Wardrive
     else if (cmd_args[0] == WARDRIVE_CMD) {

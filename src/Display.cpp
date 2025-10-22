@@ -3,6 +3,7 @@
 #include "lvgl.h"
 #include "lang_var.h"
 #include "ST7796_Defines.h"
+#include "configs.h"
 
 //#ifdef HAS_SCREEN
 

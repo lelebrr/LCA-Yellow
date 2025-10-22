@@ -1,29 +1,37 @@
 #pragma once
 
-class WiFiScan;
 #ifndef MenuFunctions_h
 #define MenuFunctions_h
 
 #include "configs.h"
 
-#define LVGL_TICK_PERIOD 5     // ✅ ms
-#define WIDTH_1 480            // ✅
-#define HEIGHT_1 320           // ✅
+#define LVGL_TICK_PERIOD 5
+#define WIDTH_1 480
+#define HEIGHT_1 320
 
 #ifdef HAS_SCREEN
-  #include "lv_conf.h"
-  #include <lvgl.h>
+#include "lv_conf.h"
+#include <lvgl.h>
 #endif
 
 #ifdef HAS_SCREEN
-  #define BATTERY_ANALOG_ON 0
+#include "WiFiScan.h"
+#include "EvilPortal.h"
+#include "BatteryInterface.h"
+#include "SDInterface.h"
+#include "settings.h"
+#include <LinkedList.h>
 
-// #include "structs.h" // ✅ Comentado - structs já definidas em WiFiScan.h
-  #include "WiFiScan.h"  // ✅ Incluir header primeiro
-  #include "BatteryInterface.h"
-  #include "SDInterface.h"
-  #include "settings.h"
-  #include <LinkedList.h>
+extern WiFiScan wifi_scan_obj;
+extern EvilPortal evil_portal_obj;
+extern SDInterface sd_obj;
+extern BatteryInterface battery_obj;
+extern Settings settings_obj;
+extern std::vector<ssid>* ssids;
+extern std::vector<AccessPoint>* access_points;
+extern LinkedList<Station>* stations;
+extern std::vector<AirTag>* airtags;
+
 
   #ifdef HAS_BUTTONS
     #include "Switches.h"
@@ -33,11 +41,6 @@ class WiFiScan;
     extern Switches r_btn;
     extern Switches c_btn;
   #endif
-
-  extern WiFiScan wifi_scan_obj;
-  extern SDInterface sd_obj;
-  extern BatteryInterface battery_obj;
-  extern Settings settings_obj;
 
   #define FLASH_BUTTON 0
 
@@ -85,11 +88,11 @@ class WiFiScan;
   #define STATUS_GPS 32
   #define GPS_MENU 33
   #define DISABLE_TOUCH 34
-  #define FLIPPER 35  // From current code
-  #define BLANK 36    // From current code
+  #define FLIPPER 35
+  #define BLANK 36
 
   void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
-  bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data);
+  void my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data);
   
   static lv_draw_ctx_t disp_buf;
   static lv_color_t buf[LV_HOR_RES_MAX * 10];
@@ -103,22 +106,10 @@ class WiFiScan;
   PROGMEM static void station_list_cb(lv_obj_t * btn, lv_event_t event);
   PROGMEM static void setting_dropdown_cb(lv_obj_t * btn, lv_event_t event);
 
-  // lvgl stuff
   PROGMEM static lv_obj_t *kb;
   PROGMEM static lv_obj_t * save_as_kb;
 
   struct Menu;
-
-  // Individual Nodes of a menu
-  /*struct MenuNode {
-    String name;
-    bool command;
-    uint16_t color;
-    uint8_t icon;
-    TFT_eSPI_Button* button;
-    bool selected;
-    std::function<void()> callable;
-  };*/
 
   struct MenuNode {
     String name;
@@ -130,7 +121,6 @@ class WiFiScan;
     std::function<void()> callable;
   };
 
-  // Full Menus
   struct Menu {
     String name;
     ::LinkedList<MenuNode>* list;
@@ -148,15 +138,11 @@ class WiFiScan;
       uint8_t mini_kb_index = 0;
       uint8_t old_gps_sat_count = 0;
       uint8_t max_graph_value = 0;
-
-      // Main menu stuff
       Menu mainMenu;
       Menu wifiMenu;
       Menu bluetoothMenu;
       Menu badusbMenu;
       Menu deviceMenu;
-
-      // Device menu stuff
       Menu whichUpdateMenu;
       Menu failedUpdateMenu;
       Menu confirmMenu;
@@ -165,8 +151,6 @@ class WiFiScan;
       Menu specSettingMenu;
       Menu languageMenu;
       Menu sdDeleteMenu;
-
-      // WiFi menu stuff
       Menu wifiSnifferMenu;
       Menu wifiAttackMenu;
       #ifdef HAS_GPS
@@ -180,26 +164,16 @@ class WiFiScan;
       #if !defined(HAS_ILI9341) && !defined(HAS_ST7789) && !defined(HAS_ST7796)
         Menu wifiStationMenu;
       #endif
-
-      // WiFi General Menu
       Menu htmlMenu;
       Menu miniKbMenu;
       Menu saveFileMenu;
       Menu genAPMacMenu;
       Menu cloneAPMacMenu;
       Menu setMacMenu;
-
-      // Bluetooth menu stuff
       Menu bluetoothSnifferMenu;
       Menu bluetoothAttackMenu;
-
-      // Settings things menus
       Menu generateSSIDsMenu;
-
       static void lv_tick_handler();
-
-      // Menu icons
-
       uint16_t getColor(uint16_t color);
       void drawAvgLine(int16_t value);
       void drawMaxLine(int16_t value, uint16_t color);
@@ -207,7 +181,6 @@ class WiFiScan;
       float graphScaleCheck(const int16_t array[TFT_WIDTH]);
       void drawGraph(int16_t *values);
       void renderGraphUI(uint8_t scan_mode = 0);
-      //void addNodes(Menu* menu, String name, uint16_t color, Menu* child, int place, std::function<void()> callable, bool selected = false, String command = "");
       void addNodes(Menu* menu, String name, uint8_t color, Menu* child, int place, std::function<void()> callable, bool selected = false, String command = "");
       void battery(bool initial = false);
       void battery2(bool initial = false);
@@ -220,56 +193,43 @@ class WiFiScan;
       #if !defined(HAS_ILI9341) && !defined(HAS_ST7796) && !defined(HAS_ST7789) && defined(HAS_BUTTONS)
         void miniKeyboard(Menu * targetMenu);
       #endif
-
       #ifdef HAS_GPS
         void displayGPSInfo();
       #endif
-
-      // Unified updateTouch function with conditional signatures
       #if defined(CYD_32CAP) || defined(CYD_35CAP)
-        uint8_t updateTouch(int16_t *x, int16_t *y, uint16_t threshold = 600);  // Capacitive version
+        uint8_t updateTouch(int16_t *x, int16_t *y, uint16_t threshold = 600);
       #else
-        uint8_t updateTouch(uint16_t *x, uint16_t *y, uint16_t threshold = 600);  // Resistive version
+        uint8_t updateTouch(uint16_t *x, uint16_t *y, uint16_t threshold = 600);
       #endif
 
     public:
       MenuFunctions();
-
       Menu* current_menu;
       Menu clearSSIDsMenu;
       Menu clearAPsMenu;
-
-      // Save Files Menu (merged from both)
       Menu saveSSIDsMenu;
       Menu loadSSIDsMenu;
       Menu saveAPsMenu;
       Menu loadAPsMenu;
-      Menu saveATsMenu;  // From current code
-      Menu loadATsMenu;  // From current code
-
+      Menu saveATsMenu;
+      Menu loadATsMenu;
       #ifdef HAS_GPS
-        // GPS Menu
         Menu gpsInfoMenu;
       #endif
-
       Menu infoMenu;
       Menu apInfoMenu;
-
       Ticker tick;
       uint16_t x = -1, y = -1;
       boolean pressed = false;
-
       bool disable_touch;
-
       String loaded_file = "";
-
       void setGraphScale(float scale);
       void initLVGL();
       void deinitLVGL();
       void selectEPHTMLGFX();
       void updateStatusBar();
       void addSSIDGFX();
-      void addAPGFX(String type = "AP");  // From current code
+      void addAPGFX(String type = "AP");
       void addStationGFX();
       void buildButtons(Menu* menu, int starting_index = 0, String button_name = "");
       void changeMenu(Menu* menu);
