@@ -1,0 +1,7 @@
+#ifndef ST7796_DEFINES_H
+#define ST7796_DEFINES_H
+
+#define ST7796_VSCRDEF 0x33
+#define ST7796_VSCRSADD 0x37
+
+#endif
