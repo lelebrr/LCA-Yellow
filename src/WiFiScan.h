@@ -94,6 +94,8 @@ public:
 
   // Métodos públicos
   WiFiScan();
+  void RunSetup();
+  void main(uint32_t currentTime);
 
   // Stuff for RAW stats
   uint32_t mgmt_frames = 0;

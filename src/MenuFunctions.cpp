@@ -1,4 +1,5 @@
 #include "MenuFunctions.h"
+#include "lvgl_compat.h"
 #include "lang_var.h"
 //#include "icons.h"
 #include "configs.h"
@@ -263,7 +264,7 @@ MenuFunctions::MenuFunctions()
     String display_string = "";
     char addr[] = "00:00:00:00:00:00";
 
-    if (event == LV_EVENT_CLICKED) {
+    if (lv_event_get_code(event) == LV_EVENT_CLICKED) {
       if (btn_text != text09) {
       }
       else {
@@ -285,7 +286,7 @@ MenuFunctions::MenuFunctions()
       }
     }
 
-    if (event == LV_EVENT_VALUE_CHANGED) {
+    if (lv_event_get_code(event) == LV_EVENT_VALUE_CHANGED) {
       if (lv_btn_get_state(btn) == LV_BTN_STATE_CHECKED_RELEASED) {
         for (int i = 0; i < stations->size(); i++) {
           wifi_scan_obj.getMAC(addr, stations->get(i).mac, 0);
@@ -349,7 +350,7 @@ MenuFunctions::MenuFunctions()
     String btn_text = lv_list_get_btn_text(btn);
     String display_string = "";
 
-    if (event == LV_EVENT_CLICKED) {
+    if (lv_event_get_code(event) == LV_EVENT_CLICKED) {
       if (btn_text != text09) {
       }
       else {
@@ -369,7 +370,7 @@ MenuFunctions::MenuFunctions()
       }
     }
 
-    if (event == LV_EVENT_VALUE_CHANGED) {
+    if (lv_event_get_code(event) == LV_EVENT_VALUE_CHANGED) {
       if (lv_btn_get_state(btn) == LV_BTN_STATE_CHECKED_RELEASED) {
         for (int i = 1; i < evil_portal_obj.html_files->size(); i++) {
           if (evil_portal_obj.html_files->get(i) == btn_text) {
@@ -452,7 +453,7 @@ MenuFunctions::MenuFunctions()
     String display_string = "";
 
     // Button is clicked
-    if (event == LV_EVENT_CLICKED) {
+    if (lv_event_get_code(event) == LV_EVENT_CLICKED) {
       if (btn_text != text09) {
       }
       // It's the back button
@@ -473,7 +474,7 @@ MenuFunctions::MenuFunctions()
       }
     }
 
-    if (event == LV_EVENT_VALUE_CHANGED) {
+    if (lv_event_get_code(event) == LV_EVENT_VALUE_CHANGED) {
       if (lv_btn_get_state(btn) == LV_BTN_STATE_CHECKED_RELEASED) {
         bool do_that_thang = false;
         for (int i = 0; i < airtags->size(); i++) {
@@ -523,7 +524,7 @@ MenuFunctions::MenuFunctions()
     String btn_text = lv_list_get_btn_text(btn);
     String display_string = "";
 
-    if (event == LV_EVENT_CLICKED) {
+    if (lv_event_get_code(event) == LV_EVENT_CLICKED) {
       if (btn_text != text09) {
       }
       else {
@@ -543,7 +544,7 @@ MenuFunctions::MenuFunctions()
       }
     }
 
-    if (event == LV_EVENT_VALUE_CHANGED) {
+    if (lv_event_get_code(event) == LV_EVENT_VALUE_CHANGED) {
       if (lv_btn_get_state(btn) == LV_BTN_STATE_CHECKED_RELEASED) {
         for (int i = 0; i < access_points->size(); i++) {
           if (access_points->get(i).essid == btn_text) {
@@ -576,7 +577,7 @@ MenuFunctions::MenuFunctions()
     String display_string = "";
 
     // Exit function
-    if (event == LV_EVENT_CLICKED) {
+    if (lv_event_get_code(event) == LV_EVENT_CLICKED) {
       if (btn_text != text09) {
         for (int i = 0; i < access_points->size(); i++) {
           if (access_points->get(i).essid == btn_text) {
@@ -656,7 +657,7 @@ MenuFunctions::MenuFunctions()
     lv_keyboard_def_event_cb(kb, event);
 
     // User has applied text box
-    if(event == LV_EVENT_APPLY){
+    if(lv_event_get_code(event) == LV_EVENT_APPLY){
       String display_string = "";
       printf("LV_EVENT_APPLY\n");
 
@@ -673,7 +674,7 @@ MenuFunctions::MenuFunctions()
       lv_textarea_set_text(ta1, display_string.c_str());
 
       lv_textarea_set_text(ta2, "");
-    }else if(event == LV_EVENT_CANCEL){
+    }else if(lv_event_get_code(event) == LV_EVENT_CANCEL){
       printf("LV_EVENT_CANCEL\n");
       menu_function_obj.deinitLVGL();
       display_obj.exit_draw = true; // set everything back to normal
@@ -683,7 +684,7 @@ MenuFunctions::MenuFunctions()
 
   void ta_event_cb(lv_obj_t * ta, lv_event_t event)
   {
-    if(event == LV_EVENT_CLICKED) {
+    if(lv_event_get_code(event) == LV_EVENT_CLICKED) {
       if(kb != NULL)
         lv_keyboard_set_textarea(kb, ta);
     }

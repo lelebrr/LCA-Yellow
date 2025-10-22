@@ -65,6 +65,13 @@
   #define GPS_SERIAL_INDEX 2  // Usando a Serial2 do ESP32
 #endif
 
+// --- Definições de Pinos para Hardware Específico (Ex: Flipper) ---
+#ifdef MARAUDER_FLIPPER
+ #define B_PIN 26  // Blue LED
+ #define G_PIN 14  // Green LED
+ #define R_PIN 12  // Red LED
+#endif
+
 // =================================================================================================
 // == Configurações do Display
 // =================================================================================================
@@ -86,8 +93,56 @@
 // =================================================================================================
 // == Definições de Ataques e Modos (Serão expandidos)
 // =================================================================================================
-#define WIFI_SCAN_OFF 0
-// ... (outras definições de ataque serão adicionadas aqui) ...
+// ===== SCAN MODES =====
+#define WIFI_SCAN_OFF                     0
+#define WIFI_SCAN_PROBE                   1
+#define WIFI_SCAN_AP                      2
+#define WIFI_SCAN_PWN                     3
+#define WIFI_SCAN_ESPRESSIF               4
+#define WIFI_SCAN_ALL                     5
+#define WIFI_SCAN_DEAUTH                  6
+#define WIFI_SCAN_TARGET_AP               7
+#define WIFI_SCAN_TARGET_AP_FULL          8
+#define WIFI_SCAN_AP_STA                  9
+#define WIFI_SCAN_STATION                 10
+#define WIFI_SCAN_RAW_CAPTURE             11
+#define WIFI_SCAN_STATION_WAR_DRIVE       12
+#define WIFI_SCAN_WAR_DRIVE               13
+#define WIFI_SCAN_SIG_STREN               14
+#define WIFI_SCAN_PACKET_RATE             15
+#define WIFI_SCAN_EAPOL                   16
+#define WIFI_SCAN_ACTIVE_EAPOL            17
+#define WIFI_SCAN_ACTIVE_LIST_EAPOL       18
+#define WIFI_SCAN_EVIL_PORTAL             19
+#define WIFI_SCAN_GPS_DATA                20
+#define WIFI_SCAN_GPS_NMEA                21
+#define WIFI_SCAN_CHAN_ANALYZER           22
+// Ataques WiFi
+#define WIFI_ATTACK_BEACON_SPAM           50
+#define WIFI_ATTACK_AUTH                  51
+#define WIFI_ATTACK_DEAUTH                52
+#define WIFI_ATTACK_AP_SPAM               53
+#define WIFI_ATTACK_RICK_ROLL             54
+// Bluetooth
+#define BT_SCAN_ALL                       100
+#define BT_SCAN_SKIMMERS                  101
+#define BT_SCAN_ANALYZER                  102
+#define BT_ATTACK_SPAM_MAGSAFE            110
+#define BT_ATTACK_SPAM_IOS17              111
+#define BT_ATTACK_SPAM_SAMSUNG            112
+#define BT_ATTACK_SPAM_WIN                113
+#define BT_ATTACK_SPAM_ANDROID            114
+#define BT_ATTACK_SPAM_ALL                115
+#define BT_ATTACK_SOUR_APPLE              116
+#define BT_SPOOF_AIRTAG                   117
+#define BT_WARDRIVE                       118
+// Updates
+#define SD_UPDATE                         200
+#define ESP_UPDATE                        201
+#define WEB_UPDATE                        202
+// LVGL
+#define LV_ADD_SSID                       300
+#define LV_JOIN_WIFI                      301
 
 #define BUF_SIZE 2048
 #define SNAP_LEN 68
