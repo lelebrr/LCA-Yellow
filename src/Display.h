@@ -111,7 +111,7 @@ class Display
     const uint16_t GREENBUTTON_W = 100;
     const uint16_t GREENBUTTON_H = 30;
 
-    const uint16_t HEIGHT_1 = 240;
+    // const uint16_t HEIGHT_1 = 240;  // ❌ COMENTAR - Já definido em MenuFunctions.h
 
     const uint16_t EXT_BUTTON_WIDTH = 30;
     const uint16_t STATUS_BAR_WIDTH = 20;

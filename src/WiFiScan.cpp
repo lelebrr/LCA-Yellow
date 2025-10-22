@@ -1,4 +1,13 @@
 #include "WiFiScan.h"
+#include "configs.h"
+
+// DECLARAÇÕES EXTERNAS (devem estar DEPOIS dos includes)
+extern std::vector<ssid>* ssids;
+extern std::vector<AccessPoint>* access_points;
+extern LinkedList<Station>* stations;
+extern std::vector<AirTag>* airtags;
+extern std::vector<Flipper>* flippers;
+
 #include "lang_var.h"
 #include "TouchDrvGT911.hpp"
 //#include "MenuFunctions.h"
@@ -507,54 +516,27 @@ void WiFiScan::RunSetup() {
   flippers = new std::vector<Flipper>();
 
   #ifdef HAS_BT
-    watch_models = new WatchModel[26] {
-      {0x1A, "Fallback Watch"},
-      {0x01, "White Watch4 Classic 44m"},
-      {0x02, "Black Watch4 Classic 40m"},
-      {0x03, "White Watch4 Classic 40m"},
-      {0x04, "Black Watch4 44mm"},
-      {0x05, "Silver Watch4 44mm"},
-      {0x06, "Green Watch4 44mm"},
-      {0x07, "Black Watch4 40mm"},
-      {0x08, "White Watch4 40mm"},
-      {0x09, "Gold Watch4 40mm"},
-      {0x0A, "French Watch4"},
-      {0x0B, "French Watch4 Classic"},
-      {0x0C, "Fox Watch5 44mm"},
-      {0x11, "Black Watch5 44mm"},
-      {0x12, "Sapphire Watch5 44mm"},
-      {0x13, "Purpleish Watch5 40mm"},
-      {0x14, "Gold Watch5 40mm"},
-      {0x15, "Black Watch5 Pro 45mm"},
-      {0x16, "Gray Watch5 Pro 45mm"},
-      {0x17, "White Watch5 44mm"},
-      {0x18, "White & Black Watch5"},
-      {0x1B, "Black Watch6 Pink 40mm"},
-      {0x1C, "Gold Watch6 Gold 40mm"},
-      {0x1D, "Silver Watch6 Cyan 44mm"},
-      {0x1E, "Black Watch6 Classic 43m"},
-      {0x20, "Green Watch6 Classic 43m"},
-    };
-
     NimBLEDevice::setScanFilterMode(CONFIG_BTDM_SCAN_DUPL_TYPE_DEVICE);
     NimBLEDevice::setScanDuplicateCacheSize(200);
     NimBLEDevice::init("");
     pBLEScan = NimBLEDevice::getScan(); // create new scan
     this->ble_initialized = true;
-
-    this->shutdownBLE();
-    esp_wifi_init(&cfg);
-    esp_wifi_set_mode(WIFI_AP_STA);
-    esp_wifi_start();
-    this->wifi_initialized = true;
-    esp_wifi_get_mac(WIFI_IF_STA, this->sta_mac);
-    delay(10);
-    esp_wifi_get_mac(WIFI_IF_AP, this->ap_mac);
-    this->setMac();
-    this->shutdownWiFi();
   #endif
 
-  this->initWiFi(1);
+  // Merged logic: Ensure WiFi is initialized correctly for all cases.
+  this->currentScanMode = WIFI_SCAN_OFF;
+  WiFi.mode(WIFI_MODE_STA);
+  WiFi.disconnect();
+  delay(100);
+  this->initWiFi(1); // Call the original initWiFi function
+}
+
+void WiFiScan::main(uint32_t currentTime) {
+  // Lógica principal do scan
+  if (this->scanning()) {
+    this->channelHop();
+    // Processar dados de scan
+  }
 }
 
 int WiFiScan::clearStations() {
