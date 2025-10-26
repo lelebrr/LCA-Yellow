@@ -1,0 +1,1 @@
+-bash: /home/jules/.platformio/penv/bin/pio: No such file or directory

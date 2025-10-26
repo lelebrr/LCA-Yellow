@@ -25,7 +25,7 @@ class EvilPortal {
 public:
   EvilPortal();
   void setup();
-  bool begin(const std::vector<WiFiScan::SSID>& ssids, const std::vector<WiFiScan::AccessPoint>& access_points);
+  bool begin(const std::vector<SSID>& ssids, const std::vector<AccessPoint>& access_points);
   bool runMain(uint8_t scan_mode);
   String get_user_name();
   String get_password();
@@ -40,7 +40,7 @@ private:
   void startAP();
   void setupServer();
   void sendToDisplay(String msg);
-  bool setAP(const std::vector<WiFiScan::SSID>& ssids, const std::vector<WiFiScan::AccessPoint>& access_points);
+  bool setAP(const std::vector<SSID>& ssids, const std::vector<AccessPoint>& access_points);
   bool setHtml();
   void setHtmlFromSerial();
 

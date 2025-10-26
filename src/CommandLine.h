@@ -12,7 +12,7 @@ class WiFiScan;
   #include "Display.h"
 #endif
 
-#include <vector>
+#include <LinkedList.h>
 #include "WiFiScan.h"
 //#include "Web.h"
 #ifdef HAS_SD
@@ -161,6 +161,18 @@ const char PROGMEM HELP_FOOT[] = "==================================";
 
 class CommandLine {
   private:
+    String getSerialInput();
+    LinkedList<String> parseCommand(String input, char* delim);
+    String toLowerCase(String str);
+    void filterAccessPoints(String filter);
+    void runCommand(String input);
+    bool checkValueExists(LinkedList<String>* cmd_args_list, int index);
+    bool inRange(int max, int index);
+    bool apSelected();
+    bool hasSSIDs();
+    void showCounts(int selected, int unselected = -1);
+    int argSearch(LinkedList<String>* cmd_args, String key);
+
     const char* ascii_art =
     "\r\n"
     "              @@@@@@                        \r\n"
@@ -190,20 +202,9 @@ class CommandLine {
 
   public:
     CommandLine();
+
     void RunSetup();
     void main(uint32_t currentTime);
-    void runCommand(String input);
-    // CORRIGIR DECLARAÇÕES - Usar std::vector
-    std::vector<String> parseCommand(String input, char* delim);
-    int argSearch(std::vector<String>& cmd_args, String key);
-    bool checkValueExists(std::vector<String>* cmd_args_list, int index);
-    bool inRange(int max, int index);
-    bool apSelected();
-    bool hasSSIDs();
-    void showCounts(int selected, int unselected);
-    String toLowerCase(String str);
-    void filterAccessPoints(String filter);
-    String getSerialInput();
 };
 
 #endif

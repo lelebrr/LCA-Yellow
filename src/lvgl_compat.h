@@ -1,97 +1,78 @@
+#pragma once
 #ifndef LVGL_COMPAT_H
 #define LVGL_COMPAT_H
 
 #include <lvgl.h>
 
-// ===== LVGL 7.x → 8.x COMPATIBILITY MACROS =====
+/*
+ * Este arquivo de compatibilidade mapeia funções e tipos da LVGL v7 (API antiga)
+ * para a v8 (API nova), permitindo que o código legado compile com o mínimo
+ * de alterações manuais.
+ *
+ * Mapeamentos Chave:
+ * - Funções de objeto: lv_obj_...() -> lv_obj_...() (geralmente nomes similares)
+ * - Cores: lv_color_make(...) -> lv_color_hex(...)
+ * - Símbolos: LV_SYMBOL_... -> LV_SYMBOL_... (sem alterações)
+ * - Alinhamento: LV_ALIGN_... -> LV_ALIGN_... (sem alterações)
+ * - Eventos: LV_EVENT_... -> LV_EVENT_... (sem alterações)
+ *
+ * Funções que exigem refatoração manual (não mapeadas aqui):
+ * - lv_cont_create() -> lv_obj_create()
+ * - lv_page_create() -> lv_obj_create()
+ * - lv_btn_create() -> lv_btn_create() (já é um tipo de objeto)
+ * - lv_label_create() -> lv_label_create() (já é um tipo de objeto)
+ * - Estilos: A API de estilos da v8 é completamente diferente e requer
+ *   refatoração manual usando lv_obj_add_style() e objetos lv_style_t.
+ *   Este arquivo NÃO trata de estilos.
+ */
 
-// ===== 1. DISPLAY BUFFER =====
-// LVGL 7: lv_disp_buf_t, lv_disp_buf_init()
-// LVGL 8: lv_disp_draw_buf_t, lv_disp_draw_buf_init()
-#define lv_disp_buf_t lv_disp_draw_buf_t
-#define lv_disp_buf_init lv_disp_draw_buf_init
+// Mapeamento de Funções de Criação de Widgets (Básico)
+// NOTA: O código original deve ser atualizado para usar os novos widgets
+// quando possível. Isso é apenas para compatibilidade básica.
+#define lv_cont_create(parent, obj_to_copy) lv_obj_create(parent)
+#define lv_page_create(parent, obj_to_copy) lv_obj_create(parent)
 
-// ===== 2. DISPLAY DRIVER =====
-// LVGL 7: disp_drv.buffer
-// LVGL 8: disp_drv.draw_buf
-// (Não é macro, correção manual necessária)
+// Funções de Objeto (Mapeamentos diretos 1:1)
+#define lv_obj_set_size(obj, w, h) lv_obj_set_size(obj, w, h)
+#define lv_obj_set_pos(obj, x, y) lv_obj_set_pos(obj, x, y)
+#define lv_obj_align(obj, base, align, x_mod, y_mod) lv_obj_align(obj, align, x_mod, y_mod)
+#define lv_obj_set_event_cb(obj, cb) lv_obj_add_event_cb(obj, cb, LV_EVENT_ALL, NULL)
+#define lv_obj_get_event_data(obj) lv_event_get_user_data(obj) // Varia, mas é um ponto de partida
+#define lv_event_get_data() lv_event_get_user_data(NULL) // Substituir por `lv_event_get_user_data(e)` no callback
 
-// ===== 3. EVENT CALLBACKS =====
-// LVGL 7: lv_obj_set_event_cb(obj, callback)
-// LVGL 8: lv_obj_add_event_cb(obj, callback, LV_EVENT_ALL, NULL)
-// Wrapper para compatibilidade
-static inline void lv_obj_set_event_cb_compat(lv_obj_t* obj, lv_event_cb_t cb) {
-    lv_obj_add_event_cb(obj, cb, LV_EVENT_ALL, NULL);
-}
-#define lv_obj_set_event_cb lv_obj_set_event_cb_compat
+// Funções de Label
+#define lv_label_set_text(obj, txt) lv_label_set_text(obj, txt)
+#define lv_label_set_long_mode(obj, mode) lv_label_set_long_mode(obj, mode)
+#define lv_label_set_align(obj, align) lv_label_set_text_align(obj, align)
 
-// ===== 4. BUTTON FLAGS =====
-// LVGL 7: lv_btn_set_checkable(btn, true/false)
-// LVGL 8: lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE)
-static inline void lv_btn_set_checkable(lv_obj_t* btn, bool enable) {
-    if (enable)
-        lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
-    else
-        lv_obj_clear_flag(btn, LV_OBJ_FLAG_CHECKABLE);
-}
+// Funções de Lista
+#define lv_list_create(parent, obj_to_copy) lv_list_create(parent)
+#define lv_list_add_btn(list, icon, txt) lv_list_add_text(list, txt) // Simplificado: v8 usa `lv_list_add_text`
+#define lv_list_get_btn_text(list, btn) lv_list_get_btn_text(list, btn)
+#define lv_list_clean(list) lv_obj_clean(list)
 
-// ===== 5. BUTTON TOGGLE =====
-// LVGL 7: lv_btn_toggle(btn)
-// LVGL 8: lv_obj_add_state() / lv_obj_clear_state()
-static inline void lv_btn_toggle(lv_obj_t* btn) {
-    if (lv_obj_has_state(btn, LV_STATE_CHECKED))
-        lv_obj_clear_state(btn, LV_STATE_CHECKED);
-    else
-        lv_obj_add_state(btn, LV_STATE_CHECKED);
-}
+// Funções de Cores
+#define lv_color_make(r, g, b) lv_color_hex((r << 16) | (g << 8) | b)
+#define LV_COLOR_WHITE lv_color_hex(0xFFFFFF)
+#define LV_COLOR_BLACK lv_color_hex(0x000000)
+#define LV_COLOR_RED lv_color_hex(0xFF0000)
+#define LV_COLOR_LIME lv_color_hex(0x00FF00)
+#define LV_COLOR_BLUE lv_color_hex(0x0000FF)
 
-// ===== 6. BUTTON STATE =====
-// LVGL 7: lv_btn_get_state(btn) → retorna estado
-// LVGL 8: lv_obj_get_state(btn) & LV_STATE_CHECKED
-static inline uint8_t lv_btn_get_state(lv_obj_t* btn) {
-    return lv_obj_get_state(btn) & LV_STATE_CHECKED ? LV_STATE_CHECKED : 0;
-}
-static inline void lv_btn_set_state(lv_obj_t* btn, uint8_t state) {
-    if (state == LV_STATE_CHECKED)
-        lv_obj_add_state(btn, LV_STATE_CHECKED);
-    else
-        lv_obj_clear_state(btn, LV_STATE_CHECKED);
-}
+// Estados de Objeto (v7 -> v8)
+#define LV_STATE_DEFAULT LV_STATE_DEFAULT
+#define LV_STATE_CHECKED LV_STATE_CHECKED
+#define LV_STATE_FOCUSED LV_STATE_FOCUSED
+#define LV_STATE_EDITED LV_STATE_EDITED
+#define LV_STATE_HOVERED LV_STATE_HOVERED
+#define LV_STATE_PRESSED LV_STATE_PRESSED
+#define LV_STATE_DISABLED LV_STATE_DISABLED
 
-// ===== 7. BUTTON STATE CONSTANTS =====
-#define LV_BTN_STATE_RELEASED 0
-#define LV_BTN_STATE_CHECKED_RELEASED LV_STATE_CHECKED
-
-// ===== 8. KEYBOARD =====
-// LVGL 7: lv_keyboard_set_cursor_manage(kb, bool)
-// LVGL 8: Não existe mais (comportamento padrão)
-static inline void lv_keyboard_set_cursor_manage(lv_obj_t* kb, bool manage) {
-    // NOOP - recurso removido em LVGL 8.x
-    (void)kb;
-    (void)manage;
-}
-
-// ===== 9. TEXTAREA =====
-// LVGL 7: lv_textarea_set_cursor_hidden(ta, bool)
-// LVGL 8: lv_obj_set_style_opa()
-static inline void lv_textarea_set_cursor_hidden(lv_obj_t* ta, bool hidden) {
-    if (hidden)
-        lv_obj_set_style_opa(ta, 0, LV_PART_CURSOR);
-    else
-        lv_obj_set_style_opa(ta, 255, LV_PART_CURSOR);
-}
-
-// ===== 10. ALIGN CONSTANTS =====
-// LVGL 7: LV_ALIGN_IN_TOP_MID, LV_ALIGN_IN_BOTTOM_MID, etc.
-// LVGL 8: LV_ALIGN_TOP_MID (sem "IN_")
-#define LV_ALIGN_IN_TOP_MID LV_ALIGN_TOP_MID
-#define LV_ALIGN_IN_BOTTOM_MID LV_ALIGN_BOTTOM_MID
-#define LV_ALIGN_IN_LEFT_MID LV_ALIGN_LEFT_MID
-#define LV_ALIGN_IN_RIGHT_MID LV_ALIGN_RIGHT_MID
-
-// ===== 11. EVENT CONSTANTS =====
-// LVGL 7: LV_EVENT_APPLY
-// LVGL 8: LV_EVENT_READY (mais genérico)
-#define LV_EVENT_APPLY LV_EVENT_READY
+// Funções de Estilo (AVISO: Mapeamento de compatibilidade MUITO limitado)
+// O código que usa estilos DEVE SER REATORADO.
+// Isto é apenas para evitar erros de compilação em casos simples.
+#define lv_obj_set_style_local_bg_color(obj, part, state, color) lv_obj_set_style_bg_color(obj, color, part | state)
+#define lv_obj_set_style_local_text_color(obj, part, state, color) lv_obj_set_style_text_color(obj, color, part | state)
+#define LV_OBJ_PART_MAIN LV_PART_MAIN
 
 #endif // LVGL_COMPAT_H

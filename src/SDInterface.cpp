@@ -126,8 +126,7 @@ void SDInterface::listDirToLinkedList(std::vector<String>* file_names, String st
       String file_name = entry.name();
       if (ext != "") {
         if (file_name.endsWith(ext)) {
-         file_names->push_back(entry.name());
-        }
+         file_names->push_back(file.name());        }
       }
       else
         file_names->push_back(file_name);
