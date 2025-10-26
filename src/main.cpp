@@ -78,6 +78,8 @@ const char *szNames[] = {"Unknown", "FT6x36", "GT911", "CST820"};
 #include "settings.h"
 #include "CommandLine.h"
 #include "lang_var.h"
+#include "WifiAttacks.h"
+#include "BleAttacks.h"
 
 #ifdef HAS_BATTERY
   #include "BatteryInterface.h"
@@ -113,6 +115,8 @@ EvilPortal evil_portal_obj;
 Buffer buffer_obj;
 Settings settings_obj;
 CommandLine cli_obj;
+WifiAttacks wifi_attacks_obj;
+BleAttacks ble_attacks_obj;
 
 #ifdef HAS_GPS
   HardwareSerial Serial2(GPS_SERIAL_INDEX);

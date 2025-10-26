@@ -24,7 +24,7 @@ class WiFiScan;
   #include "BatteryInterface.h"
   #include "SDInterface.h"
   #include "settings.h"
-  #include <LinkedList.h>
+  #include <vector>
 
   #ifdef HAS_BUTTONS
     #include "Switches.h"
@@ -134,7 +134,7 @@ class WiFiScan;
   // Full Menus
   struct Menu {
     String name;
-    ::LinkedList<MenuNode>* list;
+    std::vector<MenuNode>* list;
     Menu                * parentMenu;
     uint16_t               selected = 0;
   };
@@ -170,6 +170,9 @@ class WiFiScan;
       // WiFi menu stuff
       Menu wifiSnifferMenu;
       Menu wifiAttackMenu;
+      Menu wifiLanAttackMenu;
+      Menu wifiWPSAttackMenu;
+      Menu wifiRouterAttackMenu;
       #ifdef HAS_GPS
         Menu wardrivingMenu;
       #endif
@@ -192,7 +195,7 @@ class WiFiScan;
 
       // Bluetooth menu stuff
       Menu bluetoothSnifferMenu;
-      Menu bluetoothAttackMenu;
+      Menu bleAllAttacksMenu;
 
       // Settings things menus
       Menu generateSSIDsMenu;

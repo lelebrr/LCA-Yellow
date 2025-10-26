@@ -10,6 +10,8 @@
 #include "lvgl_compat.h"
 #include "configs.h"
 #include "TouchDrvGT911.hpp"
+#include "WifiAttacks.h"
+#include "BleAttacks.h"
 
 #ifdef HAS_DS18B20_TEMP
 #include "TempInterface.h"
@@ -30,6 +32,8 @@ extern WiFiScan wifi_scan_obj;
 extern EvilPortal evil_portal_obj;
 extern Display display_obj;
 extern SDInterface sd_obj;
+extern WifiAttacks wifi_attacks_obj;
+extern BleAttacks ble_attacks_obj;
 
 extern const unsigned char menu_icons[][66];
 
@@ -1617,7 +1621,7 @@ void MenuFunctions::displaySetting(String key, Menu* menu, int index) {
   }
 
   // Put local copy back into menu
-  menu->list->set(index, node);
+  (*menu->list)[index] = node;
 
 }
 
@@ -1635,79 +1639,79 @@ void MenuFunctions::RunSetup()
   #endif
 
   // root menu stuff
-  mainMenu.list = new LinkedList<MenuNode>(); // Get list in first menu ready
+  mainMenu.list = new std::vector<MenuNode>(); // Get list in first menu ready
 
   // Main menu stuff
-  wifiMenu.list = new LinkedList<MenuNode>(); // Get list in second menu ready
-  bluetoothMenu.list = new LinkedList<MenuNode>(); // Get list in third menu ready
-  deviceMenu.list = new LinkedList<MenuNode>();
+  wifiMenu.list = new std::vector<MenuNode>(); // Get list in second menu ready
+  bluetoothMenu.list = new std::vector<MenuNode>(); // Get list in third menu ready
+  deviceMenu.list = new std::vector<MenuNode>();
   #ifdef HAS_GPS
     if (gps_obj.getGpsModuleStatus()) {
-      gpsInfoMenu.list = new LinkedList<MenuNode>();
+      gpsInfoMenu.list = new std::vector<MenuNode>();
     }
   #endif
 
   // Device menu stuff
-  failedUpdateMenu.list = new LinkedList<MenuNode>();
-  whichUpdateMenu.list = new LinkedList<MenuNode>();
-  confirmMenu.list = new LinkedList<MenuNode>();
-  updateMenu.list = new LinkedList<MenuNode>();
-  settingsMenu.list = new LinkedList<MenuNode>();
-  specSettingMenu.list = new LinkedList<MenuNode>();
-  infoMenu.list = new LinkedList<MenuNode>();
-  languageMenu.list = new LinkedList<MenuNode>();
-  gpsMenu.list = new LinkedList<MenuNode>();
+  failedUpdateMenu.list = new std::vector<MenuNode>();
+  whichUpdateMenu.list = new std::vector<MenuNode>();
+  confirmMenu.list = new std::vector<MenuNode>();
+  updateMenu.list = new std::vector<MenuNode>();
+  settingsMenu.list = new std::vector<MenuNode>();
+  specSettingMenu.list = new std::vector<MenuNode>();
+  infoMenu.list = new std::vector<MenuNode>();
+  languageMenu.list = new std::vector<MenuNode>();
+  gpsMenu.list = new std::vector<MenuNode>();
 
   // WiFi menu stuff
-  wifiSnifferMenu.list = new LinkedList<MenuNode>();
-  wifiAttackMenu.list = new LinkedList<MenuNode>();
-  wifiLanAttackMenu.list = new LinkedList<MenuNode>();
-  wifiWPSAttackMenu.list = new LinkedList<MenuNode>();
-  wifiRouterAttackMenu.list = new LinkedList<MenuNode>();
+  wifiSnifferMenu.list = new std::vector<MenuNode>();
+  wifiAttackMenu.list = new std::vector<MenuNode>();
+  wifiLanAttackMenu.list = new std::vector<MenuNode>();
+  wifiWPSAttackMenu.list = new std::vector<MenuNode>();
+  wifiRouterAttackMenu.list = new std::vector<MenuNode>();
   #ifdef HAS_GPS
-    wardrivingMenu.list = new LinkedList<MenuNode>();
+    wardrivingMenu.list = new std::vector<MenuNode>();
   #endif
-  wifiGeneralMenu.list = new LinkedList<MenuNode>();
-  wifiAPMenu.list = new LinkedList<MenuNode>();
-  apInfoMenu.list = new LinkedList<MenuNode>();
-  setMacMenu.list = new LinkedList<MenuNode>();
-  genAPMacMenu.list = new LinkedList<MenuNode>();
+  wifiGeneralMenu.list = new std::vector<MenuNode>();
+  wifiAPMenu.list = new std::vector<MenuNode>();
+  apInfoMenu.list = new std::vector<MenuNode>();
+  setMacMenu.list = new std::vector<MenuNode>();
+  genAPMacMenu.list = new std::vector<MenuNode>();
   #ifdef HAS_BT
-    airtagMenu.list = new LinkedList<MenuNode>();
+    airtagMenu.list = new std::vector<MenuNode>();
   #endif
   #if !defined(HAS_ILI9341) && !defined(HAS_ST7796) && !defined(HAS_ST7789)
-    wifiStationMenu.list = new LinkedList<MenuNode>();
+    wifiStationMenu.list = new std::vector<MenuNode>();
   #endif
 
   // WiFi HTML menu stuff
-  htmlMenu.list = new LinkedList<MenuNode>();
+  htmlMenu.list = new std::vector<MenuNode>();
   #if (!defined(HAS_ILI9341) && !defined(HAS_ST7796) && !defined(HAS_ST7789) && defined(HAS_BUTTONS))
-    miniKbMenu.list = new LinkedList<MenuNode>();
+    miniKbMenu.list = new std::vector<MenuNode>();
   #endif
   #if !defined(HAS_ILI9341) && !defined(HAS_ST7796) && !defined(HAS_ST7789)
     #ifdef HAS_BUTTONS
       #ifdef HAS_SD
-        sdDeleteMenu.list = new LinkedList<MenuNode>();
+        sdDeleteMenu.list = new std::vector<MenuNode>();
       #endif
     #endif
   #endif
 
   // Bluetooth menu stuff
-  bluetoothSnifferMenu.list = new LinkedList<MenuNode>();
-  bluetoothAttackMenu.list = new LinkedList<MenuNode>();
+  bluetoothSnifferMenu.list = new std::vector<MenuNode>();
+  bleAllAttacksMenu.list = new std::vector<MenuNode>();
 
   // Settings stuff
-  generateSSIDsMenu.list = new LinkedList<MenuNode>();
-  clearSSIDsMenu.list = new LinkedList<MenuNode>();
-  clearAPsMenu.list = new LinkedList<MenuNode>();
-  saveFileMenu.list = new LinkedList<MenuNode>();
+  generateSSIDsMenu.list = new std::vector<MenuNode>();
+  clearSSIDsMenu.list = new std::vector<MenuNode>();
+  clearAPsMenu.list = new std::vector<MenuNode>();
+  saveFileMenu.list = new std::vector<MenuNode>();
 
-  saveSSIDsMenu.list = new LinkedList<MenuNode>();
-  loadSSIDsMenu.list = new LinkedList<MenuNode>();
-  saveAPsMenu.list = new LinkedList<MenuNode>();
-  loadAPsMenu.list = new LinkedList<MenuNode>();
-  saveATsMenu.list = new LinkedList<MenuNode>();
-  loadATsMenu.list = new LinkedList<MenuNode>();
+  saveSSIDsMenu.list = new std::vector<MenuNode>();
+  loadSSIDsMenu.list = new std::vector<MenuNode>();
+  saveAPsMenu.list = new std::vector<MenuNode>();
+  loadAPsMenu.list = new std::vector<MenuNode>();
+  saveATsMenu.list = new std::vector<MenuNode>();
+  loadATsMenu.list = new std::vector<MenuNode>();
 
   // Work menu names
   mainMenu.name = text_table1[6];
@@ -1969,6 +1973,8 @@ void MenuFunctions::RunSetup()
 
   // Build WiFi LAN Attack Menu
   wifiLanAttackMenu.parentMenu = &wifiAttackMenu;
+  // Corrigido: Usar std::vector em vez de LinkedList
+  // wifiLanAttackMenu.list = new LinkedList<MenuNode>();
   this->addNodes(&wifiLanAttackMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
     this->changeMenu(wifiLanAttackMenu.parentMenu);
   });
@@ -1978,21 +1984,63 @@ void MenuFunctions::RunSetup()
   this->addNodes(&wifiLanAttackMenu, "Ataques a Roteadores", TFTRED, NULL, ATTACKS, [this]() {
     this->changeMenu(&wifiRouterAttackMenu);
   });
-  // TODO: Adicionar os 20 ataques padrão aqui
+  this->addNodes(&wifiLanAttackMenu, "Deauthentication Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.deauthenticationFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "EAPOL Handshake Capture", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.eapolHandshakeCapture(); });
+  this->addNodes(&wifiLanAttackMenu, "PMKID Attack", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.pmkidAttack(); });
+  this->addNodes(&wifiLanAttackMenu, "Evil Twin AP", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.evilTwinAP(); });
+  this->addNodes(&wifiLanAttackMenu, "KARMA Attack", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.karmaAttack(); });
+  this->addNodes(&wifiLanAttackMenu, "Channel Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.channelFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "Disassociation Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.disassociationFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "Authentication Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.authenticationFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "Null Data Frame Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.nullDataFrameFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "Probe Response Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.probeResponseFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "CTS/RTS Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.ctsRtsFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "Beacon Spam", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.beaconSpam(); });
+  this->addNodes(&wifiLanAttackMenu, "QoS Null Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.qosNullFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "Association Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.associationFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "WPS Pixie Dust", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.wpsPixieDust(); });
+  this->addNodes(&wifiLanAttackMenu, "Fake AP DoS", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.fakeAPDoS(); });
+  this->addNodes(&wifiLanAttackMenu, "ACK Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.ackFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "Channel Switch Announcement", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.channelSwitchAnnouncement(); });
+  this->addNodes(&wifiLanAttackMenu, "SSID Confusion", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.ssidConfusion(); });
+  this->addNodes(&wifiLanAttackMenu, "Management Frame DoS", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.managementFrameDoS(); });
+  this->addNodes(&wifiLanAttackMenu, "Power Save Attack", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.powerSaveAttack(); });
+  this->addNodes(&wifiLanAttackMenu, "Fragmentation Attack", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.fragmentationAttack(); });
+  this->addNodes(&wifiLanAttackMenu, "BaPS Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.baPSFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "Client Isolation Bypass", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.clientIsolationBypass(); });
+  this->addNodes(&wifiLanAttackMenu, "WPA3 SAE Downgrade", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.wpa3SaeDowngrade(); });
+  this->addNodes(&wifiLanAttackMenu, "Beacon Timing Attack", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.beaconTimingAttack(); });
+  this->addNodes(&wifiLanAttackMenu, "Probe Request Flood", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.probeRequestFlood(); });
+  this->addNodes(&wifiLanAttackMenu, "DTIM DoS", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.dtimDoS(); });
+  this->addNodes(&wifiLanAttackMenu, "Country Code Attack", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.countryCodeAttack(); });
+  this->addNodes(&wifiLanAttackMenu, "Vendor Specific DoS", TFTRED, NULL, ATTACKS, [](){ wifi_attacks_obj.vendorSpecificDoS(); });
 
   // Build WPS Attack Menu
   wifiWPSAttackMenu.parentMenu = &wifiLanAttackMenu;
+  // Corrigido: Usar std::vector em vez de LinkedList
+  // wifiWPSAttackMenu.list = new LinkedList<MenuNode>();
   this->addNodes(&wifiWPSAttackMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
     this->changeMenu(wifiWPSAttackMenu.parentMenu);
   });
-  // TODO: Adicionar os 30 ataques WPS aqui
+  this->addNodes(&wifiWPSAttackMenu, "Pixie Dust Attack", TFTORANGE, NULL, ATTACKS, [](){ wifi_attacks_obj.wpsPixieDust(); });
+  this->addNodes(&wifiWPSAttackMenu, "WPS Brute Force", TFTORANGE, NULL, ATTACKS, [](){ wifi_attacks_obj.wpsBruteForce(); });
+  this->addNodes(&wifiWPSAttackMenu, "WPS Lock Bypass", TFTORANGE, NULL, ATTACKS, [](){ wifi_attacks_obj.wpsLockBypass(); });
+  this->addNodes(&wifiWPSAttackMenu, "Online WPS Attack", TFTORANGE, NULL, ATTACKS, [](){ wifi_attacks_obj.onlineWPSAttack(); });
+  this->addNodes(&wifiWPSAttackMenu, "WPS Flood", TFTORANGE, NULL, ATTACKS, [](){ wifi_attacks_obj.wpsFlood(); });
+  this->addNodes(&wifiWPSAttackMenu, "PIN Check Bypass", TFTORANGE, NULL, ATTACKS, [](){ wifi_attacks_obj.pinCheckBypass(); });
+  this->addNodes(&wifiWPSAttackMenu, "WPS Session Flood", TFTORANGE, NULL, ATTACKS, [](){ wifi_attacks_obj.wpsSessionFlood(); });
+  this->addNodes(&wifiWPSAttackMenu, "WPS Deauth + Pixie", TFTORANGE, NULL, ATTACKS, [](){ wifi_attacks_obj.wpsDeauthAndPixie(); });
+  this->addNodes(&wifiWPSAttackMenu, "WPS Config Reload", TFTORANGE, NULL, ATTACKS, [](){ wifi_attacks_obj.wpsConfigReload(); });
+  this->addNodes(&wifiWPSAttackMenu, "WPS Dictionary", TFTORANGE, NULL, ATTACKS, [](){ wifi_attacks_obj.wpsDictionary(); });
 
   // Build Router Attack Menu
   wifiRouterAttackMenu.parentMenu = &wifiLanAttackMenu;
+  // Corrigido: Usar std::vector em vez de LinkedList
+  // wifiRouterAttackMenu.list = new LinkedList<MenuNode>();
   this->addNodes(&wifiRouterAttackMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
     this->changeMenu(wifiRouterAttackMenu.parentMenu);
   });
-  // TODO: Adicionar os 20 ataques a roteadores aqui
+  // Placeholder for router attacks
 
 
   // Build WiFi General menu
@@ -2105,12 +2153,12 @@ void MenuFunctions::RunSetup()
         new_ap.selected = !access_points->get(i).selected;
 
         // Change selection status of menu node
-        MenuNode new_node = current_menu->list->get(i + 1);
-        new_node.selected = !current_menu->list->get(i + 1).selected;
-        current_menu->list->set(i + 1, new_node);
+        MenuNode new_node = current_menu->list->at(i + 1);
+        new_node.selected = !current_menu->list->at(i + 1).selected;
+        (*current_menu->list)[i + 1] = new_node;
 
-        access_points->set(i, new_ap);
-        }, access_points->get(i).selected);
+        access_points->at(i) = new_ap;
+        }, access_points->at(i).selected);
       }
       this->changeMenu(&wifiAPMenu);
     });
@@ -2179,9 +2227,9 @@ void MenuFunctions::RunSetup()
             new_sta.selected = !stations->get(cur_ap_sta).selected;
 
             // Change selection status of menu node
-            MenuNode new_node = current_menu->list->get(x + 1);
-            new_node.selected = !current_menu->list->get(x + 1).selected;
-            current_menu->list->set(x + 1, new_node);
+            MenuNode new_node = current_menu->list->at(x + 1);
+            new_node.selected = !current_menu->list->at(x + 1).selected;
+            (*current_menu->list)[x + 1] = new_node;
 
             // Change selection status of button key
             //if (new_sta.selected) {
@@ -2190,8 +2238,8 @@ void MenuFunctions::RunSetup()
             //  this->buttonNotSelected(i + 1);
             //}
 
-            stations->set(cur_ap_sta, new_sta);
-            }, stations->get(cur_ap_sta).selected);
+            stations->at(cur_ap_sta) = new_sta;
+            }, stations->at(cur_ap_sta).selected);
           }
 
           // Final change menu to the menu of Stations
@@ -2310,7 +2358,7 @@ void MenuFunctions::RunSetup()
     this->changeMenu(&bluetoothSnifferMenu);
   });
   this->addNodes(&bluetoothMenu, "Bluetooth Attacks", TFTRED, NULL, ATTACKS, [this]() {
-    this->changeMenu(&bluetoothAttackMenu);
+    this->changeMenu(&bleAllAttacksMenu);
   });
 
   // Build bluetooth sniffer Menu
@@ -2360,40 +2408,42 @@ void MenuFunctions::RunSetup()
   });
 
   // Bluetooth Attack menu
-  bluetoothAttackMenu.parentMenu = &bluetoothMenu; // Second Menu is third menu parent
-  this->addNodes(&bluetoothAttackMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
-    this->changeMenu(bluetoothAttackMenu.parentMenu);
+  bleAllAttacksMenu.parentMenu = &bluetoothMenu; // Second Menu is third menu parent
+  // Corrigido: Usar std::vector em vez de LinkedList
+  // bleAllAttacksMenu.list = new LinkedList<MenuNode>();
+  this->addNodes(&bleAllAttacksMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
+    this->changeMenu(bleAllAttacksMenu.parentMenu);
   });
-  this->addNodes(&bluetoothAttackMenu, "Sour Apple", TFTGREEN, NULL, DEAUTH_SNIFF, [this]() {
-    display_obj.clearScreen();
-    this->drawStatusBar();
-    wifi_scan_obj.StartScan(BT_ATTACK_SOUR_APPLE, TFT_GREEN);
-  });
-  this->addNodes(&bluetoothAttackMenu, "Swiftpair Spam", TFTCYAN, NULL, KEYBOARD_ICO, [this]() {
-    display_obj.clearScreen();
-    this->drawStatusBar();
-    wifi_scan_obj.StartScan(BT_ATTACK_SWIFTPAIR_SPAM, TFT_CYAN);
-  });
-  this->addNodes(&bluetoothAttackMenu, "Samsung BLE Spam", TFTRED, NULL, GENERAL_APPS, [this]() {
-    display_obj.clearScreen();
-    this->drawStatusBar();
-    wifi_scan_obj.StartScan(BT_ATTACK_SAMSUNG_SPAM, TFT_RED);
-  });
-  this->addNodes(&bluetoothAttackMenu, "Google BLE Spam", TFTPURPLE, NULL, LANGUAGE, [this]() {
-    display_obj.clearScreen();
-    this->drawStatusBar();
-    wifi_scan_obj.StartScan(BT_ATTACK_GOOGLE_SPAM, TFT_PURPLE);
-  });
-  this->addNodes(&bluetoothAttackMenu, "Flipper BLE Spam", TFTORANGE, NULL, FLIPPER, [this]() {
-    display_obj.clearScreen();
-    this->drawStatusBar();
-    wifi_scan_obj.StartScan(BT_ATTACK_FLIPPER_SPAM, TFT_ORANGE);
-  });
-  this->addNodes(&bluetoothAttackMenu, "BLE Spam All", TFTMAGENTA, NULL, DEAUTH_SNIFF, [this]() {
-    display_obj.clearScreen();
-    this->drawStatusBar();
-    wifi_scan_obj.StartScan(BT_ATTACK_SPAM_ALL, TFT_MAGENTA);
-  });
+  this->addNodes(&bleAllAttacksMenu, "BLE Spam Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.bleSpamFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "Sour Apple Attack", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.sourAppleAttack(); });
+  this->addNodes(&bleAllAttacksMenu, "Swift Pair Spam", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.swiftPairSpam(); });
+  this->addNodes(&bleAllAttacksMenu, "AirTag Spoofing", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.airTagSpoofing(); });
+  this->addNodes(&bleAllAttacksMenu, "BLE Beacon Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.bleBeaconFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "Connection Spam", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.connectionSpam(); });
+  this->addNodes(&bleAllAttacksMenu, "Service Discovery DoS", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.serviceDiscoveryDoS(); });
+  this->addNodes(&bleAllAttacksMenu, "Notification Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.notificationFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "Flipper Zero Spoof", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.flipperZeroSpoof(); });
+  this->addNodes(&bleAllAttacksMenu, "CC Skimmer Detect", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.ccSkimmerDetect(); });
+  this->addNodes(&bleAllAttacksMenu, "Battery Drain Attack", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.batteryDrainAttack(); });
+  this->addNodes(&bleAllAttacksMenu, "UUID Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.uuidFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "Advertising Interval DoS", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.advertisingIntervalDoS(); });
+  this->addNodes(&bleAllAttacksMenu, "Legacy BLE Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.legacyBleFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "Extended Adv Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.extendedAdvFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "Manufacturer Spam", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.manufacturerSpam(); });
+  this->addNodes(&bleAllAttacksMenu, "Rssi Manipulation", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.rssiManipulation(); });
+  this->addNodes(&bleAllAttacksMenu, "Periodic Adv Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.periodicAdvFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "GATT Write Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.gattWriteFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "Read Request Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.readRequestFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "Disconnect Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.disconnectFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "MTU Negotiation DoS", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.mtuNegotiationDoS(); });
+  this->addNodes(&bleAllAttacksMenu, "Security Manager DoS", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.securityManagerDoS(); });
+  this->addNodes(&bleAllAttacksMenu, "L2CAP Echo Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.l2capEchoFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "Scan Request Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.scanRequestFlood(); });
+  this->addNodes(&bleAllAttacksMenu, "Device Name Spoof", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.deviceNameSpoof(); });
+  this->addNodes(&bleAllAttacksMenu, "Appearance Spoof", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.appearanceSpoof(); });
+  this->addNodes(&bleAllAttacksMenu, "Tx Power Spoof", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.txPowerSpoof(); });
+  this->addNodes(&bleAllAttacksMenu, "Channel Map DoS", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.channelMapDoS(); });
+  this->addNodes(&bleAllAttacksMenu, "LE Coded PHY Flood", TFTRED, NULL, ATTACKS, [](){ ble_attacks_obj.leCodedPhyFlood(); });
 
   #if defined(HAS_ILI9341) || defined(HAS_ST7796) || defined(HAS_ST7789)
     this->addNodes(&bluetoothAttackMenu, "Spoof Airtag", TFTWHITE, NULL, ATTACKS, [this](){
@@ -2424,18 +2474,18 @@ void MenuFunctions::RunSetup()
 
         // Create the menu nodes for all of the list items
         for (int i = 0; i < menu_limit; i++) {
-          this->addNodes(&airtagMenu, airtags->get(i).mac, TFTWHITE, NULL, BLUETOOTH, [this, i](){
-            AirTag new_at = airtags->get(i);
+          this->addNodes(&airtagMenu, airtags->at(i).mac, TFTWHITE, NULL, BLUETOOTH, [this, i](){
+            AirTag new_at = airtags->at(i);
             new_at.selected = true;
 
-            airtags->set(i, new_at);
+            airtags->at(i) = new_at;
 
             // Set all other airtags to "Not Selected"
             for (int x = 0; x < airtags->size(); x++) {
               if (x != i) {
-                AirTag new_atx = airtags->get(x);
+                AirTag new_atx = airtags->at(x);
                 new_atx.selected = false;
-                airtags->set(x, new_atx);
+                airtags->at(x) = new_atx;
               }
             }
 
@@ -2511,15 +2561,15 @@ void MenuFunctions::RunSetup()
                 sd_obj.sd_files->clear();
                 delete sd_obj.sd_files;
 
-                sd_obj.sd_files = new LinkedList<String>();
+                sd_obj.sd_files = new std::vector<String>();
 
-                sd_obj.sd_files->add("Back");
+                sd_obj.sd_files->push_back("Back");
 
-                sd_obj.listDirToLinkedList(sd_obj.sd_files);
+                sd_obj.listDirToVector(sd_obj.sd_files);
 
                 int sd_file_index = 0;
 
-                this->sdDeleteMenu.list->set(0, MenuNode{sd_obj.sd_files->get(sd_file_index), false, TFTCYAN, 0, NULL, true, NULL});
+                (*this->sdDeleteMenu.list)[0] = MenuNode{sd_obj.sd_files->at(sd_file_index), false, TFTCYAN, 0, NULL, true, NULL};
                 this->buildButtons(&sdDeleteMenu);
                 this->displayCurrentMenu();
 
@@ -2532,7 +2582,7 @@ void MenuFunctions::RunSetup()
                       else
                         sd_file_index = sd_obj.sd_files->size() - 1;
 
-                      this->sdDeleteMenu.list->set(0, MenuNode{sd_obj.sd_files->get(sd_file_index), false, TFTCYAN, 0, NULL, true, NULL});
+                      (*this->sdDeleteMenu.list)[0] = MenuNode{sd_obj.sd_files->at(sd_file_index), false, TFTCYAN, 0, NULL, true, NULL};
                       this->buildButtons(&sdDeleteMenu);
                       this->displayCurrentMenu();
                     }
@@ -2543,8 +2593,8 @@ void MenuFunctions::RunSetup()
                     else
                       sd_file_index = 0;
 
-                    this->sdDeleteMenu.list->set(0, MenuNode{sd_obj.sd_files->get(sd_file_index), false, TFTCYAN, 0, NULL, true, NULL});
-                    this->buildButtons(&sdDeleteMenu, 0, sd_obj.sd_files->get(sd_file_index));
+                    (*this->sdDeleteMenu.list)[0] = MenuNode{sd_obj.sd_files->at(sd_file_index), false, TFTCYAN, 0, NULL, true, NULL};
+                    this->buildButtons(&sdDeleteMenu, 0, sd_obj.sd_files->at(sd_file_index));
                     this->displayCurrentMenu();
                   }
                   if (c_btn.justPressed()) {
@@ -2684,7 +2734,7 @@ void MenuFunctions::RunSetup()
 
   // Specific setting menu
   specSettingMenu.parentMenu = &settingsMenu;
-  addNodes(&specSettingMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
+  this->addNodes(&specSettingMenu, text09, TFTLIGHTGREY, NULL, 0, [this]() {
     this->changeMenu(specSettingMenu.parentMenu);
   });
 
@@ -2695,7 +2745,7 @@ void MenuFunctions::RunSetup()
     this->changeMenu(whichUpdateMenu.parentMenu);
   });
   #ifdef HAS_SD
-    if (sd_obj.supported) addNodes(&whichUpdateMenu, text_table1[40], TFTMAGENTA, NULL, SD_UPDATE, [this]() {
+    if (sd_obj.supported) this->addNodes(&whichUpdateMenu, text_table1[40], TFTMAGENTA, NULL, SD_UPDATE, [this]() {
       wifi_scan_obj.currentScanMode = OTA_UPDATE;
       this->changeMenu(&confirmMenu);
     });
@@ -2781,7 +2831,7 @@ void MenuFunctions::RunSetup()
               else
                 this->mini_kb_index = str_len - 2;
 
-              targetMenu->list->set(0, MenuNode{String(char_array[this->mini_kb_index]).c_str(), false, TFTCYAN, 0, NULL, true, NULL});
+              (*targetMenu->list)[0] = MenuNode{String(char_array[this->mini_kb_index]).c_str(), false, TFTCYAN, 0, NULL, true, NULL};
               this->buildButtons(targetMenu);
               while (!l_btn.justReleased())
                 delay(1);
@@ -2797,7 +2847,7 @@ void MenuFunctions::RunSetup()
               else
                 this->mini_kb_index = 0;
 
-              targetMenu->list->set(0, MenuNode{String(char_array[this->mini_kb_index]).c_str(), false, TFTCYAN, 0, NULL, true, NULL});
+              (*targetMenu->list)[0] = MenuNode{String(char_array[this->mini_kb_index]).c_str(), false, TFTCYAN, 0, NULL, true, NULL};
               this->buildButtons(targetMenu, 0, String(char_array[this->mini_kb_index]).c_str());
               while (!r_btn.justReleased())
                 delay(1);
@@ -2847,7 +2897,7 @@ void MenuFunctions::RunSetup()
                 else
                   this->mini_kb_index = 0;
 
-                targetMenu->list->set(0, MenuNode{String(char_array[this->mini_kb_index]).c_str(), false, TFTCYAN, 0, NULL, true, NULL});
+                (*targetMenu->list)[0] = MenuNode{String(char_array[this->mini_kb_index]).c_str(), false, TFTCYAN, 0, NULL, true, NULL};
                 this->buildButtons(targetMenu, 0, String(char_array[this->mini_kb_index]).c_str());
               }
             }
@@ -2874,7 +2924,7 @@ void MenuFunctions::RunSetup()
                 else
                   this->mini_kb_index = str_len - 2;
 
-                targetMenu->list->set(0, MenuNode{String(char_array[this->mini_kb_index]).c_str(), false, TFTCYAN, 0, NULL, true, NULL});
+                (*targetMenu->list)[0] = MenuNode{String(char_array[this->mini_kb_index]).c_str(), false, TFTCYAN, 0, NULL, true, NULL};
                 this->buildButtons(targetMenu);
               }
             }
@@ -2914,7 +2964,9 @@ void MenuFunctions::RunSetup()
             display_obj.tft.println(wifi_scan_obj.current_mini_kb_ssid + "\n");
             display_obj.tft.setTextColor(TFT_GREEN, TFT_BLACK);
 
-            display_obj.tft.println(ssids->get(0).essid);
+            if (!ssids->empty()) {
+              display_obj.tft.println(ssids->at(0).essid);
+            }
 
             display_obj.tft.setTextColor(TFT_ORANGE, TFT_BLACK);
             display_obj.tft.println("U/D - Rem/Add Char");
@@ -2977,8 +3029,7 @@ void MenuFunctions::displayGPSInfo() {
 void MenuFunctions::addNodes(Menu * menu, String name, uint8_t color, Menu * child, int place, std::function<void()> callable, bool selected, String command)
 {
   TFT_eSPI_Button new_button;
-  menu->list->add(MenuNode{name, false, color, place, &new_button, selected, callable});
-  //menu->list->add(MenuNode{name, false, color, place, selected, callable});
+  menu->list->push_back(MenuNode{name, false, color, place, &new_button, selected, callable});
 }
 
 void MenuFunctions::setGraphScale(float scale) {

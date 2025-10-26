@@ -109,7 +109,7 @@ bool SDInterface::removeFile(String file_path) {
     return false;
 }
 
-void SDInterface::listDirToLinkedList(std::vector<String>* file_names, String str_dir, String ext) {
+void SDInterface::listDirToVector(std::vector<String>* file_names, String str_dir, String ext) {
   if (this->supported) {
     File dir = SD.open(str_dir);
     while (true)
